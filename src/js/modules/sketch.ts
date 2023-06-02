@@ -10,6 +10,8 @@ const sketch = (p: p5) => {
   let endY = 0;
   let maxRPM = 300;
   let currentRPM = maxRPM;
+  let rotationAngle = 0;
+  let prevRotationAngle = 0;
 
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
@@ -17,10 +19,10 @@ const sketch = (p: p5) => {
     p.rectMode(p.CENTER);
 
     // Attach event listeners
-    document.addEventListener("mousedown", mousePressed);
-    document.addEventListener("mouseup", mouseReleased);
-    document.addEventListener("touchstart", touchStarted);
-    document.addEventListener("touchsend", touchEnded);
+    p.mousePressed = mousePressed;
+    p.mouseReleased = mouseReleased;
+    p.touchStarted = touchStarted;
+    p.touchEnded = touchEnded;
   };
 
   p.draw = () => {
@@ -40,11 +42,17 @@ const sketch = (p: p5) => {
       }
     }
 
-    currentRPM = p.lerp(currentRPM, rotationSpeed, 0.05);
+    currentRPM = p.lerp(currentRPM, rotationSpeed, 0.1);
+
+    let deltaAngle = (currentRPM / 60) * deltaTime * 360;
+    rotationAngle += deltaAngle;
+    if (rotationAngle >= 360) {
+      rotationAngle -= 360;
+    }
 
     p.push();
     p.translate(p.width / 2, p.height / 2);
-    p.rotate(p.frameCount * (currentRPM / 60));
+    p.rotate(rotationAngle);
 
     let colorValue = p.map(rotationSpeed, 0, maxRPM, 0, 255);
     p.fill(colorValue, 0, 0);
@@ -53,6 +61,7 @@ const sketch = (p: p5) => {
     p.pop();
 
     startTime = p.millis();
+    prevRotationAngle = rotationAngle;
   };
 
   function touchStarted(event: Event) {
@@ -80,6 +89,12 @@ const sketch = (p: p5) => {
     endX = p.mouseX;
     endY = p.mouseY;
   }
+
+  // function judgeInSpinner() {
+  //   if (p.mouseX) {
+  //     return true;
+  //   }
+  // }
 };
 
 export default sketch;
