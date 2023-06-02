@@ -1,112 +1,92 @@
 import p5 from "p5";
 
 const sketch = (p: p5) => {
-  let rotationSpeed = 0;
-  let pressStartTime = 0;
-  let pressEndTime = 0;
-  let startX = 0;
-  let startY = 0;
-  let endX = 0;
-  let endY = 0;
-  let maxRPM = 300;
-  let currentRPM = maxRPM;
-  let startAngle = 0;
-  let rotationAngle = 0;
-  let prevRotationAngle = 0;
+  let centerX: number;
+  let centerY: number;
+  let shapeSize: number;
+  let rotation: number;
+  let rotationSpeed: number;
+  let isDragging: boolean;
+  let dragStartTime: number;
+  let dragStartAngle: number;
+  let dragStartMouseX: number;
+  let dragStartMouseY: number;
 
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
-    p.angleMode(p.DEGREES);
-    p.rectMode(p.CENTER);
-
-    // Attach event listeners
-    p.mousePressed = mousePressed;
-    p.mouseReleased = mouseReleased;
-    p.touchStarted = touchStarted;
-    p.touchEnded = touchEnded;
+    centerX = p.width / 2;
+    centerY = p.height / 2;
+    shapeSize = p.height / 2;
+    rotation = 0;
+    rotationSpeed = 0;
+    isDragging = false;
   };
 
   p.draw = () => {
     p.background(220);
 
-    // let deltaTime = (pressEndTime - pressStartTime) / 1000;
-    // let distance = p.dist(startX, startY, endX, endY);
-
-    // if (!p.mouseIsPressed || p.touches.length === 0) {
-    //   if (rotationSpeed < maxRPM) {
-    //     rotationSpeed = p.map(distance / deltaTime, 0, p.width, 0, maxRPM);
-    //     rotationSpeed *= 0.99;
-    //     if (rotationSpeed < 0.01) {
-    //       rotationSpeed = 0;
-    //     }
-    //   }
-    // }
-
-    if(p.mouseIsPressed || p.touches.length > 0){
-      console.log("isPress");
-
-      startAngle = p.atan2(p.mouseX - startX, p.mouseY - startY) * (-1);
-
-      rotationAngle =  p.atan2(p.mouseX - p.windowWidth/2, p.mouseY - p.windowHeight/2) * (-1);
-      console.log(p.mouseX);
-      console.log(p.mouseY);
-      console.log(rotationAngle);
-    }
-
-    currentRPM = p.lerp(currentRPM, rotationSpeed, 0.1);
-
-    // let deltaAngle = (currentRPM / 60) * deltaTime * 360;
-    // rotationAngle += deltaAngle;
-    if (rotationAngle >= 360) {
-      rotationAngle -= 360;
-    }
-
+    // 図形の描画
     p.push();
-    p.translate(p.width / 2, p.height / 2);
-    p.rotate(rotationAngle);
-
-    let colorValue = p.map(rotationSpeed, 0, maxRPM, 0, 255);
-    p.fill(colorValue, 0, 0);
-    p.rect(0, 0, 400, 50);
-
+    p.translate(centerX, centerY);
+    p.rotate(rotation);
+    drawSymmetricShape();
     p.pop();
 
-    pressStartTime = p.millis();
-    prevRotationAngle = rotationAngle;
+    // 回転速度の減衰
+    if (!isDragging) {
+      rotationSpeed *= 0.99;
+    }
+
+    // 回転の更新
+    rotation += rotationSpeed;
+
+    // ドラッグの時間と距離から回転数を計算
+    if (isDragging) {
+      const dragEndTime = p.millis();
+      const dragDuration = dragEndTime - dragStartTime;
+      const dragDistance = p.dist(
+        p.mouseX,
+        p.mouseY,
+        dragStartMouseX,
+        dragStartMouseY
+      );
+      const maxRotationSpeed = 0.1;
+      rotationSpeed = (dragDistance / dragDuration) * maxRotationSpeed;
+    }
   };
 
-  function touchStarted(event: Event) {
-    pressStartTime = p.millis();
-    startX = p.mouseX;
-    startY = p.mouseY;
-    event.preventDefault();
-  }
+  p.mousePressed = () => {
+    const d = p.dist(p.mouseX, p.mouseY, centerX, centerY);
+    if (d < shapeSize / 2) {
+      isDragging = true;
+      dragStartTime = p.millis();
+      dragStartAngle = rotation;
+      dragStartMouseX = p.mouseX;
+      dragStartMouseY = p.mouseY;
+    }
+  };
 
-  function touchEnded(event: Event) {
-    pressEndTime = p.millis();
-    endX = p.mouseX;
-    endY = p.mouseY;
-    event.preventDefault();
-  }
+  p.mouseReleased = () => {
+    isDragging = false;
+  };
 
-  function mousePressed() {
-    pressStartTime = p.millis();
-    startX = p.mouseX;
-    startY = p.mouseY;
-    startAngle = p.atan2(p.mouseX - startX, p.mouseY - startY);
-  }
+  function drawSymmetricShape() {
+    const segments = 12;
+    const angleStep = (2 * p.PI) / segments;
+    const radius = shapeSize / 2;
 
-  function mouseReleased() {
-    pressEndTime = p.millis();
-    endX = p.mouseX;
-    endY = p.mouseY;
-  }
+    p.stroke(0);
+    p.strokeWeight(2);
+    p.noFill();
 
-  // function judgeInSpinner() {
-  //   if (p.mouseX) {
-  //     return true;
-  //   }
-  // }
+    p.beginShape();
+    for (let i = 0; i < segments; i++) {
+      const x = p.cos(angleStep * i) * radius;
+      const y = p.sin(angleStep * i) * radius;
+      p.curveVertex(x, y);
+    }
+    p.endShape(p.CLOSE);
+  }
 };
 
 export default sketch;
