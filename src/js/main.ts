@@ -1,5 +1,5 @@
 import '../scss/style.scss';
-
+import p5 from "p5";
 import sketch from "./modules/sketch";
 
-sketch();
+new p5(sketch);
