@@ -1,5 +1,7 @@
 import p5 from "p5";
 
+// 画像の読み込み
+
 const sketch = (p: p5) => {
   let centerX: number;
   let centerY: number;
@@ -11,6 +13,11 @@ const sketch = (p: p5) => {
   let dragStartAngle: number;
   let dragStartMouseX: number;
   let dragStartMouseY: number;
+  let img: p5.Image;
+
+  p.preload = () => {
+    img = p.loadImage("/img/handSpinner.png");
+  }
 
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
@@ -25,11 +32,17 @@ const sketch = (p: p5) => {
   p.draw = () => {
     p.background(220);
 
-    // 図形の描画
+    // 画像の描画
     p.push();
     p.translate(centerX, centerY);
     p.rotate(rotation);
-    drawSymmetricShape();
+
+    // 回転数に応じて画像の色を計算
+    const maxRotationSpeed = 0.1;
+    const red = p.map(Math.abs(rotationSpeed), 0, maxRotationSpeed, 100, 255);
+    p.tint(red, 0, 0); // 画像の色を設定
+    p.imageMode(p.CENTER);
+    p.image(img, 0, 0, shapeSize, shapeSize);
     p.pop();
 
     // 回転速度の減衰
@@ -69,24 +82,6 @@ const sketch = (p: p5) => {
   p.mouseReleased = () => {
     isDragging = false;
   };
-
-  function drawSymmetricShape() {
-    const segments = 12;
-    const angleStep = (2 * p.PI) / segments;
-    const radius = shapeSize / 2;
-
-    p.stroke(0);
-    p.strokeWeight(2);
-    p.noFill();
-
-    p.beginShape();
-    for (let i = 0; i < segments; i++) {
-      const x = p.cos(angleStep * i) * radius;
-      const y = p.sin(angleStep * i) * radius;
-      p.curveVertex(x, y);
-    }
-    p.endShape(p.CLOSE);
-  }
 };
 
 export default sketch;
