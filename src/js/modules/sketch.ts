@@ -47,7 +47,7 @@ const sketch = (p: p5) => {
 
     // 回転速度の減衰
     if (!isDragging) {
-      rotationSpeed *= 0.99;
+      rotationSpeed *= 0.999;
     }
 
     // 回転の更新
