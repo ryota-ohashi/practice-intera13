@@ -30,20 +30,6 @@ const sketch = (p: p5) => {
   };
 
   p.draw = () => {
-    p.background(220);
-
-    // 画像の描画
-    p.push();
-    p.translate(centerX, centerY);
-    p.rotate(rotation);
-
-    // 回転数に応じて画像の色を計算
-    const maxRotationSpeed = 0.1;
-    const red = p.map(Math.abs(rotationSpeed), 0, maxRotationSpeed, 50, 255);
-    p.tint(red, 0, 0); // 画像の色を設定
-    p.imageMode(p.CENTER);
-    p.image(img, 0, 0, shapeSize, shapeSize);
-    p.pop();
 
     // 回転速度の減衰
     if (!isDragging) {
@@ -66,6 +52,8 @@ const sketch = (p: p5) => {
       const maxRotationSpeed = 0.1;
       rotationSpeed = (dragDistance / dragDuration) * maxRotationSpeed;
     }
+
+    drawHandSpinner();
   };
 
   p.mousePressed = () => {
@@ -82,6 +70,23 @@ const sketch = (p: p5) => {
   p.mouseReleased = () => {
     isDragging = false;
   };
+
+  const drawHandSpinner = () => {
+    p.background(220);
+
+    // 画像の描画
+    p.push();
+    p.translate(centerX, centerY);
+    p.rotate(rotation);
+
+    // 回転数に応じて画像の色を計算
+    const maxRotationSpeed = 0.1;
+    const red = p.map(Math.abs(rotationSpeed), 0, maxRotationSpeed, 50, 255);
+    p.tint(red, 0, 0); // 画像の色を設定
+    p.imageMode(p.CENTER);
+    p.image(img, 0, 0, shapeSize, shapeSize);
+    p.pop();
+  }
 };
 
 export default sketch;
