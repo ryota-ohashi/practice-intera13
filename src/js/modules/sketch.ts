@@ -10,13 +10,13 @@ const sketch = (p: p5) => {
   let rotationSpeed: number;
   let isDragging: boolean;
   let dragStartTime: number;
-  let dragStartAngle: number;
+  // let dragStartAngle: number;
   let dragStartMouseX: number;
   let dragStartMouseY: number;
   let img: p5.Image;
 
   p.preload = () => {
-    img = p.loadImage("/img/handSpinner.png");
+    img = p.loadImage("/assets/img/handSpinner.png");
   }
 
   p.setup = () => {
@@ -39,7 +39,7 @@ const sketch = (p: p5) => {
 
     // 回転数に応じて画像の色を計算
     const maxRotationSpeed = 0.1;
-    const red = p.map(Math.abs(rotationSpeed), 0, maxRotationSpeed, 100, 255);
+    const red = p.map(Math.abs(rotationSpeed), 0, maxRotationSpeed, 50, 255);
     p.tint(red, 0, 0); // 画像の色を設定
     p.imageMode(p.CENTER);
     p.image(img, 0, 0, shapeSize, shapeSize);
@@ -73,7 +73,7 @@ const sketch = (p: p5) => {
     if (d < shapeSize / 2) {
       isDragging = true;
       dragStartTime = p.millis();
-      dragStartAngle = rotation;
+      // dragStartAngle = rotation;
       dragStartMouseX = p.mouseX;
       dragStartMouseY = p.mouseY;
     }
