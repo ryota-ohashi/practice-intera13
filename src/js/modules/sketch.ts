@@ -48,8 +48,6 @@ const sketch = (p: p5) => {
 
       const initAngle = p.atan2(dragStartMouseX - centerX, dragStartMouseY - centerY);
       const nextAngle = p.atan2(p.mouseX - centerX, p.mouseY - centerY);
-      // console.log(nextAngle);
-      console.log(nextAngle/p.PI * 360);
 
       if(initAngle - nextAngle <= 0){
         rotationSpeed *= (-1);
