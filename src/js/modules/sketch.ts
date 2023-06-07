@@ -4,6 +4,7 @@ const sketch = (p: p5) => {
   let centerX: number;
   let centerY: number;
   let shapeSize: number;
+  let initRotation: number;
   let rotation: number;
   let rotationSpeed: number;
   let isDragging: boolean;
@@ -29,11 +30,13 @@ const sketch = (p: p5) => {
   p.draw = () => {
     if (!isDragging) {
       rotationSpeed *= 0.999;
+      rotation += rotationSpeed;
     }
 
-    rotation += rotationSpeed;
 
     if (isDragging) {
+
+      // rotationSpeedの計算
       const dragEndTime = p.millis();
       const dragDuration = dragEndTime - dragStartTime;
       const dragDistance = p.dist(
@@ -52,6 +55,9 @@ const sketch = (p: p5) => {
       if(initAngle - nextAngle <= 0){
         rotationSpeed *= (-1);
       }
+
+      // ドラッグ中はマウスと回転を一致させる
+      rotation = initRotation + (initAngle - nextAngle);
     }
 
     drawHandSpinner();
@@ -61,6 +67,7 @@ const sketch = (p: p5) => {
     const d = p.dist(p.mouseX, p.mouseY, centerX, centerY);
     if (d < shapeSize / 2) {
       isDragging = true;
+      initRotation = rotation;
       dragStartTime = p.millis();
       dragStartMouseX = p.mouseX;
       dragStartMouseY = p.mouseY;
