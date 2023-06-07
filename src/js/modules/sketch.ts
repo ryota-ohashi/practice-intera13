@@ -28,15 +28,23 @@ const sketch = (p: p5) => {
   };
 
   p.draw = () => {
+
+    //ドラッグしていない時
     if (!isDragging) {
+
       rotationSpeed *= 0.999;
       rotation += rotationSpeed;
-    }
 
+    }else{
+      //ドラッグしている時
 
-    if (isDragging) {
+      // ドラッグ中はマウスと回転を一致させる
+      const initAngle = p.atan2(dragStartMouseX - centerX, dragStartMouseY - centerY);
+      const nextAngle = p.atan2(p.mouseX - centerX, p.mouseY - centerY);
 
-      // rotationSpeedの計算
+      rotation = initRotation + (initAngle - nextAngle);
+
+      // ドラッグ中にrotationSpeedの計算
       const dragEndTime = p.millis();
       const dragDuration = dragEndTime - dragStartTime;
       const dragDistance = p.dist(
@@ -49,18 +57,14 @@ const sketch = (p: p5) => {
 
       rotationSpeed = (dragDistance / dragDuration) * maxRotationSpeed;
 
-      const initAngle = p.atan2(dragStartMouseX - centerX, dragStartMouseY - centerY);
-      const nextAngle = p.atan2(p.mouseX - centerX, p.mouseY - centerY);
-
       if(initAngle - nextAngle <= 0){
         rotationSpeed *= (-1);
       }
-
-      // ドラッグ中はマウスと回転を一致させる
-      rotation = initRotation + (initAngle - nextAngle);
     }
 
+    // 描画処理
     drawHandSpinner();
+
   };
 
   p.mousePressed = () => {
