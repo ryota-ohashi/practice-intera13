@@ -4,6 +4,7 @@ const sketch = (p: p5) => {
   let centerX: number;
   let centerY: number;
   let shapeSize: number;
+  let prevAngle: number;
   let initRotation: number;
   let rotation: number;
   let rotationSpeed: number;
@@ -57,9 +58,16 @@ const sketch = (p: p5) => {
 
       rotationSpeed = (dragDistance / dragDuration) * maxRotationSpeed;
 
-      if(initAngle - nextAngle <= 0){
+      // if(initAngle - nextAngle <= 0){
+      //   rotationSpeed *= (-1);
+      // }
+
+      if (prevAngle - nextAngle <= 0) {
         rotationSpeed *= (-1);
       }
+
+      // rotationを保存
+      prevAngle = nextAngle;
     }
 
     // 描画処理
