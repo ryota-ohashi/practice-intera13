@@ -15,7 +15,7 @@ const sketch = (p: p5) => {
   let img: p5.Image;
 
   p.preload = () => {
-    img = p.loadImage("/assets/img/handSpinner.png");
+    img = p.loadImage("./assets/img/handSpinner.png");
   };
 
   p.setup = () => {
