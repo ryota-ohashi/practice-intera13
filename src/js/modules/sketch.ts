@@ -4,7 +4,8 @@ const sketch = (p: p5) => {
   let centerX: number;
   let centerY: number;
   let shapeSize: number;
-  let prevAngle: number;
+  let prevMouseX: number;
+  let prevMouseY: number;
   let initRotation: number;
   let rotation: number;
   let rotationSpeed: number;
@@ -26,53 +27,48 @@ const sketch = (p: p5) => {
     rotation = 0;
     rotationSpeed = 0;
     isDragging = false;
+    prevMouseX = 0;
+    prevMouseY = 0;
   };
 
   p.draw = () => {
-
     //ドラッグしていない時
     if (!isDragging) {
-
       rotationSpeed *= 0.999;
       rotation += rotationSpeed;
-
-    }else{
+    } else {
       //ドラッグしている時
 
       // ドラッグ中はマウスと回転を一致させる
       const initAngle = p.atan2(dragStartMouseX - centerX, dragStartMouseY - centerY);
       const nextAngle = p.atan2(p.mouseX - centerX, p.mouseY - centerY);
 
+
       rotation = initRotation + (initAngle - nextAngle);
 
       // ドラッグ中にrotationSpeedの計算
       const dragEndTime = p.millis();
       const dragDuration = dragEndTime - dragStartTime;
-      const dragDistance = p.dist(
-        p.mouseX,
-        p.mouseY,
-        dragStartMouseX,
-        dragStartMouseY
-      );
+      const dragDistance = p.dist(p.mouseX, p.mouseY, dragStartMouseX, dragStartMouseY);
       const maxRotationSpeed = 0.1;
 
       rotationSpeed = (dragDistance / dragDuration) * maxRotationSpeed;
 
-      // if(initAngle - nextAngle <= 0){
-      //   rotationSpeed *= (-1);
-      // }
+      const a = p.createVector(prevMouseX - centerX, prevMouseY - centerY).normalize();
+      const b = p.createVector(p.mouseX - centerX, p.mouseY - centerY).normalize();
 
-      if (prevAngle - nextAngle <= 0) {
-        rotationSpeed *= (-1);
+      const cross = a.cross(b).z
+
+      if (cross <= 0) {
+        rotationSpeed *= -1;
       }
 
-      // rotationを保存
-      prevAngle = nextAngle;
+      prevMouseX = p.mouseX;
+      prevMouseY = p.mouseY;
     }
 
     // 描画処理
     drawHandSpinner();
-
   };
 
   p.mousePressed = () => {
